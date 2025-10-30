@@ -2,7 +2,7 @@ const app = require("./app");
 const config = require("./app/config");
 const MongoDB = require("./app/utils/mongodb.util");
 
-async function starServer() {
+async function startServer() {
     try {
         await MongoDB.connect(config.db.uri);
         console.log("Connected to the database!");
@@ -18,7 +18,7 @@ async function starServer() {
 
 }
 
-starServer();
+startServer();
 
 //star server
 /*const PORT = config.app.port;
