@@ -6,7 +6,7 @@ class ContactService {
     }
 
     // Thêm các phương thức làm việc với CSDL tại đây
-    extractConactData(payload) {
+    extractContactData(payload) {
         const contact = {
             name: payload.name,
             email: payload.email,
@@ -21,7 +21,7 @@ class ContactService {
         return contact;
     }
     async create(payload) {
-        const contact = this.extractConactData(payload);
+        const contact = this.extractContactData(payload);
         const result = await this.Contact.findOneAndUpdate(
             contact,
             { $set: { favorite: contact.favorite === true } },
@@ -29,6 +29,39 @@ class ContactService {
         );
         return result;
     }
+
+    async find(filter) {
+        const cursor = await this.Contact.find(filter);
+        return await cursor.toArray();
+    }
+
+    async findByName(name) {
+        return await this.find({
+            name: { $regex: new RegExp(new RegExp(name)), $options: "i" },
+        });
+    }
+
+    async findById(id) {
+        return await this.Contact.findOne({
+            _id: ObjectId.isValid(id) ? new ObjectId(id) : null,
+        });
+    }
+
+    async update(id, payload) {
+        const filter = {
+            _id: ObjectId.isValid(id) ? new ObjectId(id) : null,
+        };
+        const update = this.extractContactData(payload);
+        const result = await this.Contact.findOneAndUpdate(
+            filter,
+            { $set: update },
+            { returnDocument: "after" }
+        );
+        return result.value; //return result;
+    }
+
+
 }
+
 
 module.exports = ContactService;

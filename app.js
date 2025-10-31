@@ -6,6 +6,9 @@ const ApiError = require("./app/api-error");
 
 const app = express();
 
+app.use(cors());
+app.use(express.json());
+
 app.use("/api/contacts", contactsRouter);
 // handle 404 response
 app.use((req, res, next) => {
@@ -21,9 +24,6 @@ app.use((err, req, res, next) => {
         message: err.message || "Internal Server Error",
     });
 });
-
-app.use(cors());
-app.use(express.json());
 
 app.get("/", (req, res) => {
     res.json({ message: "Welcome to contact book application." });
