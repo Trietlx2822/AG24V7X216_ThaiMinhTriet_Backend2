@@ -20,7 +20,7 @@ class ContactService {
         );
         return contact;
     }
-    async create(payload) {
+    /*async create(payload) {
         const contact = this.extractContactData(payload);
         const result = await this.Contact.findOneAndUpdate(
             contact,
@@ -28,6 +28,13 @@ class ContactService {
             { returnDocument: "after", upsert: true }
         );
         return result;
+    }*/
+
+    async create(payload) {
+        const contact = this.extractContactData(payload);
+        const result = await this.Contact.insertOne(contact);
+        // Trả về document vừa tạo
+        return await this.Contact.findOne({ _id: result.insertedId });
     }
 
     async find(filter) {
@@ -52,14 +59,33 @@ class ContactService {
             _id: ObjectId.isValid(id) ? new ObjectId(id) : null,
         };
         const update = this.extractContactData(payload);
-        const result = await this.Contact.findOneAndUpdate(
-            filter,
-            { $set: update },
-            { returnDocument: "after" }
-        );
-        return result.value; //return result;
+
+        const result = await this.Contact.updateOne(filter, { $set: update });
+
+        if (result.matchedCount === 0) {
+            // Không tìm thấy contact nào để cập nhật
+            return null;
+        }
+
+        // Sau khi update, truy vấn lại document để trả về kết quả thật
+        return await this.findById(id);
     }
 
+    async delete(id) {
+        const result = await this.Contact.findOneAndDelete({
+            _id: ObjectId.isValid(id) ? new ObjectId(id) : null,
+        });
+        return result;
+    }
+
+    async findFavorite() {
+        return await this.find({ favorite: true });
+    }
+
+    async deleteAll() {
+        const result = await this.Contact.deleteMany({});
+        return result.deletedCount;
+    }
 
 }
 
