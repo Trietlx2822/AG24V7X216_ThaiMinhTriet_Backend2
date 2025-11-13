@@ -13,6 +13,8 @@ class ContactService {
             address: payload.address,
             phone: payload.phone,
             favorite: payload.favorite,
+            married: payload.married,
+            hobbies: Array.isArray(payload.hobbies) ? payload.hobbies : []
         };
         // Remove undefined fields
         Object.keys(contact).forEach(
@@ -20,15 +22,6 @@ class ContactService {
         );
         return contact;
     }
-    /*async create(payload) {
-        const contact = this.extractContactData(payload);
-        const result = await this.Contact.findOneAndUpdate(
-            contact,
-            { $set: { favorite: contact.favorite === true } },
-            { returnDocument: "after", upsert: true }
-        );
-        return result;
-    }*/
 
     async create(payload) {
         const contact = this.extractContactData(payload);
